@@ -7,6 +7,7 @@ _Monitor Printer {
     //alternative to building and storing strings
     struct Data {
         bool assigned = false;//used to determine when to flush
+        Kind kind;//what kind of column are we dealing with (Parent, etc.)
         char state;//state (S, D, N, etc.)
         //the variables below are ints passed in print members
         //these dataValues take on the form of whatever data accompanies the print message
@@ -16,6 +17,8 @@ _Monitor Printer {
     };
     Data* buffer;//array to store each Kind's next print data
     void flush();//print a line of data
+    int getBufferIdFromKind(Kind kind, int lid);//returns index in buffer where kind column is located
+    void printHelper(int id, Kind kind, char state);//helper to prevent code duplication
 
   public:
 	enum Kind { Parent, Groupoff, WATCardOffice, NameServer, Truck, BottlingPlant, Student, Vending, Courier };
