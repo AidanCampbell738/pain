@@ -3,7 +3,7 @@
 
 using namespace std;
 
-//Constructor
+//Constructor  
 //stores arguments and creates couriers
 WATCardOffice::WATCardOffice(Printer& prt, Bank& bank, unsigned int numCouriers) : 
     printer(prt), numCouriers(numCouriers) {

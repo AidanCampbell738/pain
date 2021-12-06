@@ -41,7 +41,7 @@ _Task WATCardOffice {
     /* Passing an sid value of -1 will terminate the WATCardOffice and all its couriers
     /*
     /*================================================================================*/
-	_Event Lost {};//lost WATCard
+	_Event Lost {};//lost watcard
 	WATCardOffice(Printer& prt, Bank& bank, unsigned int numCouriers);//constructor
     ~WATCardOffice();//destructor
 	WATCard::FWATCard create(unsigned int sid, unsigned int amount);//create watcard
