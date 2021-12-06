@@ -10,6 +10,9 @@ bool isEmpty( unsigned int cargo[], unsigned int size ) {
     return true;
 }
 
+Truck::Truck( Printer & prt, NameServer & nameServer, BottlingPlant & plant, 
+    unsigned int numVendingMachines, unsigned int maxStockPerFlavour ) : prt( prt ), nameServer( nameServer ), plant( plant ), numVendingMachines( numVendingMachines ), maxStockPerFlavour( maxStockPerFlavour ) {}
+
 void Truck::main() {
     VendingMachine ** vendingMachineList = nameServer.getMachineList();
     int nextToService = 0;
