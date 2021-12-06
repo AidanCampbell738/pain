@@ -4,7 +4,6 @@
 #include "nameserver.h"
 
 _Task BottlingPlant {
-    uOwnerLock shipmentLock;
     uCondLock shipmentSignal;
     uCondLock truckSignal;
     Printer & prt;
