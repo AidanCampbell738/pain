@@ -2,6 +2,7 @@
 #include "truck.h"
 #include <algorithm>
 #include "MPRNG.h"
+#include <iostream>
 
 // Main task for BottlingPlant
 void BottlingPlant::main() {
@@ -30,6 +31,8 @@ void BottlingPlant::main() {
         }
     }
     prt.print( Printer::BottlingPlant, 'F' );
+    // Allow truck to receive exception
+    _Accept( getShipment );
 }
 
 // Wait for, and retrieve, a shipment of bottles from the Plant, copying the shipment into cargo
@@ -37,6 +40,7 @@ void BottlingPlant::main() {
 void BottlingPlant::getShipment( unsigned int cargo[ ] ) {
     if ( shutdown ) {
         // Plant is shutting down
+        uRendezvousAcceptor();
         _Throw Shutdown();
     }
     // Shipment isn't ready yet, wait until it is

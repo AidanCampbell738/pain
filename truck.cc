@@ -1,6 +1,7 @@
 #include "truck.h"
 #include <algorithm>
 #include "MPRNG.h"
+#include <iostream>
 
 // Helper function for calculating the number of bottles in a given shipment
 // Cargo: shipment array, size: number of flavours
