@@ -2,6 +2,9 @@
 
 #include "nameserver.h"
 #include "printer.h"
+#include "watcard.h"
+
+_Task NameServer;
 
 _Task VendingMachine {
     std::vector<unsigned int> sodaInventory;

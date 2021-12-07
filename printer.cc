@@ -10,19 +10,19 @@ Printer::Printer(unsigned int numStudents, unsigned int numVendingMachines, unsi
 
     //Print all titles
     cout << "Parent\tGropoff\tWATOff\tNames\tTruck\tPlant";
-    for(int i = 0; i < numStudents; i++) {//students
+    for(unsigned int i = 0; i < numStudents; i++) {//students
         cout << "\tStud" << i;
     }
-    for(int i = 0; i < numVendingMachines; i++) {//vending machines
+    for(unsigned int i = 0; i < numVendingMachines; i++) {//vending machines
         cout << "\tMach" << i;
     }
-    for(int i = 0; i < numCouriers; i++) {//courriers
+    for(unsigned int i = 0; i < numCouriers; i++) {//courriers
         cout << "\tCour" << i;
     }
     cout << endl;
 
     //Print *******'s
-    for(int i = 0; i < voters; i++) {
+    for(unsigned int i = 0; i < numCols; i++) {
         if(i > 0) cout << "\t";
         cout << "*******";
     }
@@ -32,7 +32,7 @@ Printer::Printer(unsigned int numStudents, unsigned int numVendingMachines, unsi
 //Non-trivial destructor
 //delete the buffer, print last values, and print final message
 Printer::~Printer() {
-    for(int i = 0; i < voters; i++) {
+    for(unsigned int i = 0; i < numCols; i++) {
         if(buffer[i].assigned) {//print any messages that haven't been printed yet
             flush();
             break;
@@ -47,7 +47,7 @@ Printer::~Printer() {
 //whose "assigned" boolean is already true
 void Printer::flush() {
     int blankSpaces = -1;//used to configure whitespace (blankSpace represents the number of blank columns in the line)
-    for(int i = 0; i < numCols; i++) {
+    for(unsigned int i = 0; i < numCols; i++) {
         if(buffer[i].assigned) {//only print stuff for voters with data to print
             for(int j = 0; j < blankSpaces + 1 && i > 0; j++) {
                 cout << "\t";//print tab characters
@@ -106,7 +106,7 @@ void Printer::flush() {
 }
 
 //returns the index in the buffer array corresponding to the given kind and lid values
-int Printer::getBufferIdFromKind(Kind kind, int lid) {
+unsigned int Printer::getBufferIdFromKind(Kind kind, int lid) {
     switch(kind) {
         case Kind::Parent: return 0;
         case Kind::Groupoff: return 1;
@@ -142,24 +142,24 @@ void Printer::print(Kind kind, char state, unsigned int value1) {
 }
 
 //Add new message to buffer
-void print(Kind kind, char state, unsigned int value1, unsigned int value2) {
+void Printer::print(Kind kind, char state, unsigned int value1, unsigned int value2) {
     print(kind, state, value1);
     buffer[getBufferIdFromKind(kind, 0)].dataValue2 = value2;
 }
 
 //Add new message to buffer
-void print(Kind kind, unsigned int lid, char state) {
+void Printer::print(Kind kind, unsigned int lid, char state) {
     printHelper(getBufferIdFromKind(kind, lid), kind, state);
 }
 
 //Add new message to buffer
-void print(Kind kind, unsigned int lid, char state, unsigned int value1) {
+void Printer::print(Kind kind, unsigned int lid, char state, unsigned int value1) {
     print(kind, lid, state);
     buffer[getBufferIdFromKind(kind, lid)].dataValue1 = value1;
 }
 
 //Add new message to buffer
-void print(Kind kind, unsigned int lid, char state, unsigned int value1, unsigned int value2) {
+void Printer::print(Kind kind, unsigned int lid, char state, unsigned int value1, unsigned int value2) {
     print(kind, lid, state, value1);
     buffer[getBufferIdFromKind(kind, lid)].dataValue2 = value2;
 }

@@ -1,4 +1,5 @@
 #include "config.h"
+#include "MPRNG.h"
 #include <iostream>
 
 using namespace std;

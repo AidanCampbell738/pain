@@ -1,10 +1,10 @@
-#ifdef _WATCARDOFFICE_
-#define _WATCARDOFFICE_
+#pragma once
+
 #include <uFuture.h>
 #include <vector>
-
-//use global random variable declared in a6main.cc
-extern MPRNG mprng;
+#include "bank.h"
+#include "watcard.h"
+#include "printer.h"
 
 _Task WATCardOffice {
 
@@ -16,31 +16,33 @@ _Task WATCardOffice {
 	};
 
 	_Task Courier { // communicates with bank
+        Printer &printer;
         unsigned int id;//courier id (used in printing)
-        bool stop = false;//true when time to terminate
+        bool shouldStop = false;//true when time to terminate
         Bank &bank;//reference to bank
+        WATCardOffice &office;
         void main();//task main
 
         public:
-            Courier(unsigned int id, Bank &bank) : id(id), bank(bank) {}//constructor
+            Courier(Printer &printer, unsigned int id, Bank &bank, WATCardOffice& office) : printer(printer), id(id), bank(bank), office(office) {}//constructor
             void stop();//call to terminate courier
     };
 
     Printer &printer;//reference to printer
     unsigned int numCouriers;//number of couriers
     std::vector<Job*> requests;//vector of requests (a vector is allowed as per piazza @1069)
-    Courier* couriers;//array of couriers
+    Courier** couriers;//array of couriers
     uCondition requestingWork;//condition that couriers block on when requesting a job
 
 	void main();//task main
-    WATCard::FWATCard cardHelper(unsigned int sid, unsigned int amount);//helper to reduce code duplication
+    WATCard::FWATCard cardHelper(unsigned int sid, unsigned int oldBalance, unsigned int amount);//helper to reduce code duplication
 
   public:
-    /*================================================================================*/
-    /*
-    /* Passing an sid value of -1 will terminate the WATCardOffice and all its couriers
-    /*
-    /*================================================================================*/
+    /*================================================================================*
+     *
+     * Passing an sid value of -1 will terminate the WATCardOffice and all its couriers
+     *
+     *================================================================================*/
 	_Event Lost {};//lost watcard
 	WATCardOffice(Printer& prt, Bank& bank, unsigned int numCouriers);//constructor
     ~WATCardOffice();//destructor
@@ -48,5 +50,3 @@ _Task WATCardOffice {
 	WATCard::FWATCard transfer(unsigned int sid, unsigned int amount, WATCard * card);//transfer from bank to watcard
 	Job* requestWork();//courier calls to get job
 };
-
-#endif

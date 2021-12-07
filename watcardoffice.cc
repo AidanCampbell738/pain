@@ -1,5 +1,6 @@
 #include "watcardoffice.h"
 #include "watcard.h"
+#include "MPRNG.h"
 
 using namespace std;
 
@@ -8,20 +9,20 @@ using namespace std;
 WATCardOffice::WATCardOffice(Printer& prt, Bank& bank, unsigned int numCouriers) : 
     printer(prt), numCouriers(numCouriers) {
     //Create couriers
-    Courier* tempCouriers[numCouriers];
-    for(int i = 0; i < numCouriers; i++) {
-        tempCouriers[i] = new Courier(i, bank);
+    couriers = new Courier * [numCouriers];
+    for(unsigned int i = 0; i < numCouriers; i++) {
+        couriers[i] = new Courier(printer, i, bank, *this);
     }
-    couriers = tempCouriers;//set couriers member array
 }
 
 //Destructor
 //deletes all couriers (after termination)
 WATCardOffice::~WATCardOffice() {
     //delete all couriers
-    for(int i = 0; i < numCouriers; i++) {
+    for(unsigned int i = 0; i < numCouriers; i++) {
         delete couriers[i];
     }
+    delete [] couriers;
 }
 
 //Courier Task main
@@ -29,12 +30,12 @@ WATCardOffice::~WATCardOffice() {
 //after, will get money from that student's bank account
 //will create new watcard or will lose watcard (1/6 chance) and raise exception
 //will terminate after stop() is called
-WATCardOffice::Courier::main() {
+void WATCardOffice::Courier::main() {
     printer.print(Printer::Courier, id, 'S');
     for(;;) {
-        if(stop) break;
-        Job* currentJob = requestWork();//request job from WATCardOffice (will block)
-        if(stop) break;
+        if(shouldStop) break;
+        Job* currentJob = office.requestWork();//request job from WATCardOffice (will block)
+        if(shouldStop) break;
 
         //Withdraw money from the bank
         printer.print(Printer::Courier, id, 't', currentJob->sid, currentJob->amount);
@@ -43,12 +44,15 @@ WATCardOffice::Courier::main() {
 
         if(mprng(5) == 0) { //lost watcard
             printer.print(Printer::Courier, id, 'L', currentJob->sid);
-            currentJob->result = new Lost;//put exception at future spot
+            // TODO: the following (commented out) does not compile. I've replaced it with my guess of what's supposed to happen here. Needs to be verified.
+            //currentJob->result = new Lost;//put exception at future spot
+            _Resume Lost() _At office;
         } else {
             //Create WATCard
             WATCard* watcard = new WATCard();
-            watcard->deposit(oldBalance + amount);
-            currentJob->result = watcard;
+            // TODO: Are we sure we leave the old balance?
+            watcard->deposit(currentJob->amount + currentJob->oldBalance);
+            currentJob->result.delivery(watcard);
         }
         delete currentJob;
     }
@@ -57,42 +61,49 @@ WATCardOffice::Courier::main() {
 
 //stop
 //terminate courier
-WATCardOffice::Courier::stop() {
-    stop = true;
+void WATCardOffice::Courier::stop() {
+    shouldStop = true;
 }
 
 //WATCardOffice Task main
 //will accept create and transfer requests from students
 //will delegate task to calling couriers
 //when terminated (passed an sid of -1), will terminate all couriers and unblock waiting couriers
-WATCardOffice::main() {
+// TODO: changed this so that instead of sid -1 (impossible since these are uints) we wait for the destructor - verify this is correct
+void WATCardOffice::main() {
     printer.print(Printer::WATCardOffice, 'S');
     for(;;) {
-        _Accept(create) {
-            if(requests.front().sid == -1)  break;
-            printer.print(Printer::WATCardOffice, 'C', requests.front().sid, requests.front().amount);
+        _Accept(~WATCardOffice) {
+            break;
+        }
+        or _Accept(create) {
+            printer.print(Printer::WATCardOffice, 'C', requests.front()->sid, requests.front()->amount);
         } or _Accept(transfer) {
-            if(requests.front().sid == -1)  break;
-            printer.print(Printer::WATCardOffice, 'T', requests.front().sid, requests.front().amount);
+            printer.print(Printer::WATCardOffice, 'T', requests.front()->sid, requests.front()->amount);
         }
         requestingWork.signalBlock();
-        requests.pop_front();  
+        // TODO: queue would be better here. Probably not a priority unless we have time.
+        requests.erase(requests.begin());
         printer.print(Printer::WATCardOffice, 'W');
     }
     //terminate couriers
-    for(int i = 0; i < numCouriers; i++) {
-        couriers[i].stop();
+    for(unsigned int i = 0; i < numCouriers; i++) {
+        couriers[i]->stop();
     }
     //unblock all waiting couriers
-    while(!waitForResult.empty()) {
-        waitForResult.signalBlock();
+    // TODO: changed this naively. Is this what was intended? The previous signal is unused except for here
+    //while(!waitForResult.empty()) {
+    //    waitForResult.signalBlock();
+    //}
+    while(!requestingWork.empty()) {
+        requestingWork.signalBlock();
     }
     printer.print(Printer::WATCardOffice, 'F');
 }
 
 //Helper function to prevent code duplication
 //used by both create and transfer to create a new job and add it to the requests vector
-WATCard::FWATCard cardHelper(unsigned int sid, unsigned int oldBalance, unsigned int amount) {
+WATCard::FWATCard WATCardOffice::cardHelper(unsigned int sid, unsigned int oldBalance, unsigned int amount) {
     //create new Job
     Job* j = new Job(sid, oldBalance, amount);
     //add job to list

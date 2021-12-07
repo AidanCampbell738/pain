@@ -1,4 +1,5 @@
 #include "groupoff.h"
+#include "MPRNG.h"
 
 Groupoff::Groupoff( Printer & prt, unsigned int numStudents, unsigned int sodaCost, unsigned int groupoffDelay ) : prt( prt ), numStudents( numStudents ), sodaCost( sodaCost ), groupoffDelay( groupoffDelay ) {
     requests.resize( numStudents );
@@ -6,7 +7,7 @@ Groupoff::Groupoff( Printer & prt, unsigned int numStudents, unsigned int sodaCo
 
 // Groupoff main task
 void Groupoff::main() {
-    prt.print( Groupoff, 'S' );
+    prt.print( Printer::Groupoff, 'S' );
     // Wait for all students to submit a request
     while ( numReceived < numStudents ) {
         _Accept( giftCard );
@@ -22,18 +23,18 @@ void Groupoff::main() {
             yield( groupoffDelay );
             // Choose recipient
             unsigned int i = mprng( 0, requests.size() - 1 );
-            WATCard card;
-            prt.print( Groupoff, 'D', sodaCost );
+            WATCard * card = new WATCard();
+            prt.print( Printer::Groupoff, 'D', sodaCost );
             // Deposit the cost of a soda on the card
-            card.deposit( sodaCost );
+            card->deposit( sodaCost );
             // Send the card to the student
             requests[i]->card.delivery( card );
             // Remove the request so that other requests can be processed
             delete requests[i];
-            requests.remove( i );
+            requests.erase( requests.begin() + i );
         }
     }
-    prt.print( Groupoff, 'F' );
+    prt.print( Printer::Groupoff, 'F' );
 }
 
 // Return a future that will provide a WATCard gift card at a later time

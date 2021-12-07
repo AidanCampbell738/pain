@@ -1,9 +1,11 @@
 #include "bottlingplant.h"
+#include "truck.h"
 #include <algorithm>
+#include "MPRNG.h"
 
 // Main task for BottlingPlant
 void BottlingPlant::main() {
-    prt.print( BottlingPlant, 'S' );
+    prt.print( Printer::BottlingPlant, 'S' );
     // Create truck for deliveries
     Truck truck( prt, nameServer, *this, numVendingMachines, maxStockPerFlavour );
     for ( ;; ) {
@@ -15,12 +17,12 @@ void BottlingPlant::main() {
         _Else {
             // Produce a new shipment
             unsigned int bottlesProduced = 0;
-            for ( unsigned int i = 0; i < NUM_FLAVOURS; i++ ) {
+            for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i++ ) {
                 // Generate random bottle production
-                cargo[i] = mprng( 0, maxShippedPerFlavour );
-                bottlesProduced += cargo[i];
+                shipment[i] = mprng( 0, maxShippedPerFlavour );
+                bottlesProduced += shipment[i];
             }
-            prt.print( BottlingPlant, 'G', bottlesProduced );
+            prt.print( Printer::BottlingPlant, 'G', bottlesProduced );
             // Signal truck to pick up shipment
             shipmentReady = true;
             shipmentLock.signal();
@@ -29,7 +31,7 @@ void BottlingPlant::main() {
             yield( timeBetweenShipments );
         }
     }
-    prt.print( BottlingPlant, 'F' );
+    prt.print( Printer::BottlingPlant, 'F' );
 }
 
 // Wait for, and retrieve, a shipment of bottles from the Plant, copying the shipment into cargo
@@ -37,7 +39,7 @@ void BottlingPlant::main() {
 void BottlingPlant::getShipment( unsigned int cargo[ ] ) {
     if ( shutdown ) {
         // Plant is shutting down
-        _Throw Shutdown;
+        _Throw Shutdown();
     }
     // Shipment isn't ready yet, wait until it is
     if ( !shipmentReady ) {
@@ -46,13 +48,13 @@ void BottlingPlant::getShipment( unsigned int cargo[ ] ) {
     // Signal a new production run to begin
     truckLock.signal();
     // Copy shipment into cargo
-    for ( unsigned int i = 0; i < NUM_FLAVOURS; i += 1 ) {
+    for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i += 1 ) {
         cargo[i] = shipment[i];
     }
-    prt.print( BottlingPlant, 'P' );
+    prt.print( Printer::BottlingPlant, 'P' );
     shipmentReady = false;
 }
 
 BottlingPlant::BottlingPlant( Printer & prt, NameServer & nameServer, unsigned int numVendingMachines, unsigned int maxShippedPerFlavour, unsigned int maxStockPerFlavour, unsigned int timeBetweenShipments ) : prt( prt ), nameServer( nameServer ), numVendingMachines( numVendingMachines ), maxShippedPerFlavour( maxShippedPerFlavour ), maxStockPerFlavour( maxStockPerFlavour ), timeBetweenShipments( timeBetweenShipments ) {
-    shipment.resize( NUM_FLAVOURS );
+    shipment.resize( VendingMachine::NUM_FLAVOURS );
 }

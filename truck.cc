@@ -1,5 +1,6 @@
 #include "truck.h"
 #include <algorithm>
+#include "MPRNG.h"
 
 // Helper function for calculating the number of bottles in a given shipment
 // Cargo: shipment array, size: number of flavours
@@ -16,14 +17,14 @@ Truck::Truck( Printer & prt, NameServer & nameServer, BottlingPlant & plant,
 
 // Main task for truck
 void Truck::main() {
-    prt.print( Truck, 'S' );
+    prt.print( Printer::Truck, 'S' );
     // Retrieve machines to deliver to
     VendingMachine ** vendingMachineList = nameServer.getMachineList();
     int nextToService = 0;
     L0: for ( ;; ) {
         // Maintain index where we started, so we know when we've completed a full loop
         int firstToService = nextToService;
-        unsigned int cargo[NUM_FLAVOURS];
+        unsigned int cargo[VendingMachine::NUM_FLAVOURS];
         unsigned int bottlesLeft;
         // Grab a coffee
         yield( mprng( 1, 10 ) );
@@ -31,10 +32,10 @@ void Truck::main() {
             try {
                 // Retrieve a shipment from the bottling plant
                 plant.getShipment( cargo );
-                bottlesLeft = getShipmentSize( cargo, NUM_FLAVOURS )
-                prt.print( Truck, 'P', bottlesLeft );
+                bottlesLeft = getShipmentSize( cargo, VendingMachine::NUM_FLAVOURS );
+                prt.print( Printer::Truck, 'P', bottlesLeft );
             }
-            _Catch ( BottlingPlant::Shutdown ) {
+            _Catch ( BottlingPlant::Shutdown& ) {
                 // Plant is shutting down, so we're done
                 break L0;
             }
@@ -44,15 +45,15 @@ void Truck::main() {
                 // Shipment is empty, get a new shipment
                 break L1;
             }
-            prt.print( Truck, 'd', nextToService, bottlesLeft );
+            prt.print( Printer::Truck, 'd', nextToService, bottlesLeft );
             // Retrieve the vending machine inventory, signalling that restocking has started
             unsigned int * inventory = vendingMachineList[nextToService]->inventory();
             // Restock each flavour
-            for ( unsigned int i = 0; i != NUM_FLAVOURS; i++ ) {
+            for ( unsigned int i = 0; i != VendingMachine::NUM_FLAVOURS; i++ ) {
                 if ( cargo[i] < maxStockPerFlavour - inventory[i] ) {
                     // We don't have enough cargo to fully restock
                     inventory[i] += cargo[i];
-                    prt.print( Truck, 'U', nextToService, maxStockPerFlavour - inventory[i] );
+                    prt.print( Printer::Truck, 'U', nextToService, maxStockPerFlavour - inventory[i] );
                     cargo[i] = 0;
                 }
                 else {
@@ -64,18 +65,18 @@ void Truck::main() {
             // Signal to vending machine that restocking is done
             vendingMachineList[nextToService]->restocked();
             // Calculate remaining cargo
-            bottlesLeft = getShipmentSize( cargo, NUM_FLAVOURS );
-            prt.print( Truck, 'D', nextToService, bottlesLeft );
+            bottlesLeft = getShipmentSize( cargo, VendingMachine::NUM_FLAVOURS );
+            prt.print( Printer::Truck, 'D', nextToService, bottlesLeft );
             // Service next vending machine
             nextToService += 1;
             nextToService %= numVendingMachines;
             if ( mprng( 1, 100 ) == 42 ) {
                 // Flat tire
-                prt.print( Truck, 'X' );
+                prt.print( Printer::Truck, 'X' );
                 yield( 10 );
             }
             // Continue until we complete a full loop
         } while ( firstToService != nextToService );
     }
-    prt.print( Truck, 'F' );
+    prt.print( Printer::Truck, 'F' );
 }

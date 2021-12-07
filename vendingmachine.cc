@@ -1,4 +1,5 @@
 #include "vendingmachine.h"
+#include "MPRNG.h"
 
 VendingMachine::VendingMachine( Printer & prt, NameServer & nameServer, unsigned int id, unsigned int sodaCost ) : prt( prt ), nameServer( nameServer ), id( id ), sodaCost( sodaCost ) {
     sodaInventory.resize( NUM_FLAVOURS );
@@ -6,11 +7,11 @@ VendingMachine::VendingMachine( Printer & prt, NameServer & nameServer, unsigned
 
 // VendingMachine main task
 void VendingMachine::main() {
-    prt.print( VendingMachine, 'S', sodaCost );
+    prt.print( Printer::Vending, 'S', sodaCost );
     for ( ;; ) {
         _Accept( ~VendingMachine ) {
             // Vending machine was deleted, stop
-            prt.print( VendingMachine, 'F' );
+            prt.print( Printer::Vending, 'F' );
             break;
         }
         // When restocking begins, block other tasks until restocking ends
@@ -26,37 +27,37 @@ void VendingMachine::main() {
 void VendingMachine::buy( Flavours flavour, WATCard & card ) {
     if ( sodaInventory[flavour] == 0 ) {
         // Selected flavour is out of stock
-        _Throw Stock;
+        _Throw Stock();
     }
     else if ( card.getBalance() < sodaCost ) {
         // Insufficient funds
-        _Throw Funds;
+        _Throw Funds();
     }
     else if ( mprng( 1, 5 ) == 1 ) {
         // Soda is free, throw an exception and remove soda
         sodaInventory[flavour] -= 1;
-        prt.print( VendingMachine, 'A' );
-        _Throw Free;
+        prt.print( Printer::Vending, 'A' );
+        _Throw Free();
     }
     else {
         // Debit amount from Watcard
         card.withdraw( sodaCost );
         // Remove soda from inventory
         sodaInventory[flavour] -= 1;
-        prt.print( VendingMachine, 'B', flavour, sodaInventory[flavour] );
+        prt.print( Printer::Vending, 'B', flavour, sodaInventory[flavour] );
     }
 }
 
 // Returns the current soda inventory, and prevents buying sodas until restocked() is called
 unsigned int * VendingMachine::inventory() {
-    prt.print( VendingMachine, 'r' );
+    prt.print( Printer::Vending, 'r' );
     // Return inventory pointer
     return &( sodaInventory[0] );
 }
 
 // Signal that restocking is finished
 void VendingMachine::restocked() {
-    prt.print( VendingMachine, 'R' );
+    prt.print( Printer::Vending, 'R' );
 }
 
 // Get the price of a soda

@@ -29,3 +29,5 @@ _Monitor MPRNG {
 	__attribute__(( warn_unused_result )) unsigned int operator()( unsigned int l, unsigned int u ) { return operator()( u - l ) + l; } // [l,u]
 	__attribute__(( warn_unused_result )) unsigned int calls() { return PRNGcnt; }
 }; // MPRNG
+
+extern MPRNG mprng;

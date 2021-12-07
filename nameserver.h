@@ -1,7 +1,10 @@
 #pragma once
 
 #include "printer.h"
+#include "vendingmachine.h"
 #include <vector>
+
+_Task VendingMachine;
 
  _Task NameServer {
     std::vector<VendingMachine *> machines;

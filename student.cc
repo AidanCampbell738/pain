@@ -4,14 +4,15 @@
 #include "watcardoffice.h"
 #include "groupoff.h"
 #include "vendingmachine.h"
+#include "MPRNG.h"
 
 using namespace std;
 
 //Helper function to prevent code duplication
 //Will get a vending machine from nameserver and print the appropriate message
-VendingMachine* Student::getVM() {
-    VendingMachine* vm = nameServer.getMachine(id);//get machine
-    printer.print(Printer::student, id, 'V', vm->getId());//print message
+VendingMachine * Student::getVM() {
+    VendingMachine * vm = nameServer.getMachine(id);//get machine
+    printer.print(Printer::Student, id, 'V', vm->getId());//print message
     return vm;
 }
 
@@ -24,7 +25,7 @@ VendingMachine* Student::getVM() {
 void Student::main() {
     int numPurchases = mprng(1, maxPurchases);//number of sodas to buy
     int favFlavour = mprng(3);//favourite flavour
-    printer.print(Printer::student, id, 'S', favFlavour, numPurchases);
+    printer.print(Printer::Student, id, 'S', favFlavour, numPurchases);
 
     WATCard::FWATCard myWatcard = cardOffice.create(id, 5);//create watcard
     WATCard::FWATCard myGiftcard = groupoff.giftCard();//get giftcard
@@ -39,31 +40,31 @@ void Student::main() {
             try {
                 //Choose a giftcard, if available
                 if(myGiftcard.available()) {
-                    vendingmachine.buy(favFlavour, myGiftcard);//try to buy
-                    printer.print(Printer::student, id, 'G', favFlavour, myGiftcard.getBalance());
+                    vendingmachine->buy((VendingMachine::Flavours)favFlavour, *myGiftcard());//try to buy
+                    printer.print(Printer::Student, id, 'G', favFlavour, myGiftcard()->getBalance());
                 } else {
-                    vendingmachine.buy(favFlavour, myWatcard);//try to buy
-                    printer.print(Printer::student, id, 'B', favFlavour, myWatcard.getBalance());
+                    vendingmachine->buy((VendingMachine::Flavours)favFlavour, *myWatcard());//try to buy
+                    printer.print(Printer::Student, id, 'B', favFlavour, myWatcard()->getBalance());
                 }
                 break;//exit for loop on successful purchase
-            } catch(WATCardOffice::Lost) {//Watcard was lost by courier
-                printer.print(Printer::student, id, 'L');//print message
+            } _Catch(WATCardOffice::Lost&) {//Watcard was lost by courier
+                printer.print(Printer::Student, id, 'L');//print message
                 myWatcard = cardOffice.create(id, 5);//get new watcard
-            } catch(VendingMachine::Free) {//free soda
+            } _Catch(VendingMachine::Free&) {//free soda
                 if(myGiftcard.available()) {//print message
-                    printer.print(Printer::student, id, 'a', favFlavour, myGiftcard.getBalance());
+                    printer.print(Printer::Student, id, 'a', favFlavour, myGiftcard()->getBalance());
                 } else {
-                    printer.print(Printer::student, id, 'A', favFlavour, myWatcard.getBalance());
+                    printer.print(Printer::Student, id, 'A', favFlavour, myWatcard()->getBalance());
                 }
                 yield(4);//drink free soda
-            } catch(VendingMachine::Funds) {//not enough money to buy soda
-                myWatcard = cardOffice.transfer(id, vendingmachine.cost() + 5, &myWatcard);//get more money
+            } _Catch(VendingMachine::Funds&) {//not enough money to buy soda
+                myWatcard = cardOffice.transfer(id, vendingmachine->cost() + 5, myWatcard());//get more money
                 yield(mprng(1, 10));//yield before trying again
-            } catch(VendingMachine::Stock) {//favourite soda out of stock
+            } _Catch(VendingMachine::Stock&) {//favourite soda out of stock
                 vendingmachine = getVM();//try a different vending machine
                 yield(mprng(1, 10));//yield before trying again
             }
         }
     }
-    printer.print(Printer::student, id, 'F');
+    printer.print(Printer::Student, id, 'F');
 }

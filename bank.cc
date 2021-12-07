@@ -1,22 +1,33 @@
 #include "bank.h"
 
-Bank( unsigned int numStudents ) {
+Bank::Bank( unsigned int numStudents ) : numStudents( numStudents ) {
     balances.resize( numStudents );
+    depositSignals = new uCondition * [numStudents];
+    for ( unsigned int i = 0; i < numStudents; i += 1 ) {
+        depositSignals[i] = new uCondition();
+    }
+}
+
+Bank::~Bank() {
+    for ( unsigned int i = 0; i < numStudents; i += 1 ) {
+        delete depositSignals[i];
+    }
+    delete [] depositSignals;
 }
 
 // Add specified funds to account with given id
-void deposit( unsigned int id, unsigned int amount ) {
+void Bank::deposit( unsigned int id, unsigned int amount ) {
     balances[id] += amount;
     // Trigger accounts waiting for deposit to recheck balance
-    depositSignal.broadcast();
+    depositSignals[id]->signal();
 }
 
 // Remove the specified amount of funds from the account with the given id
 // Can block
-void withdraw( unsigned int id, unsigned int amount ) {
+void Bank::withdraw( unsigned int id, unsigned int amount ) {
     // Wait until sufficient funds are present, checking whenever a deposit is made
     while ( balances[id] < amount ) {
-        depositSignal.wait();
+        depositSignals[id]->wait();
     }
     balances[id] -= amount;
 }
