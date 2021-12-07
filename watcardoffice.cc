@@ -45,8 +45,7 @@ void WATCardOffice::Courier::main() {
         if(mprng(5) == 0) { //lost watcard
             printer.print(Printer::Courier, id, 'L', currentJob->sid);
             // TODO: the following (commented out) does not compile. I've replaced it with my guess of what's supposed to happen here. Needs to be verified.
-            //currentJob->result = new Lost;//put exception at future spot
-            _Resume Lost() _At office;
+            currentJob->result.exception(new Lost);//put exception at future spot
         } else {
             //Create WATCard
             WATCard* watcard = new WATCard();
