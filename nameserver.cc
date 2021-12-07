@@ -6,11 +6,13 @@ NameServer::NameServer( Printer & prt, unsigned int numVendingMachines, unsigned
 }
 
 void NameServer::main() {
+    prt.print( NameServer, 'S' );
     for ( ; nextid < numVendingMachines; ) {
         _Accept( VMregister );
     }
     for ( ;; ) {
         _Accept( ~NameServer ) {
+            prt.print( NameServer, 'F' );
             break;
         }
         or _Accept( getMachine, getMachineList );
@@ -18,6 +20,7 @@ void NameServer::main() {
 }
 
 void VMregister( VendingMachine * vendingmachine ) {
+    prt.print( NameServer, 'R', vendingmachine->getId() );
     machines[nextId] = vendingmachine;
     nextId += 1;
 }
@@ -25,7 +28,8 @@ void VMregister( VendingMachine * vendingmachine ) {
 VendingMachine * getMachine( unsigned int id ) {
     unsigned int machine = assignedMachines[id];
     assignedMachines[id] = ( machine + 1 ) % numVendingMachines;
-    return machines[id];
+    prt.print( NameServer, 'N', id, machine );
+    return machine;
 }
 
 VendingMachine ** getMachineList() {

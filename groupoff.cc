@@ -5,6 +5,7 @@ Groupoff::Groupoff( Printer & prt, unsigned int numStudents, unsigned int sodaCo
 }
 
 void Groupoff::main() {
+    prt.print( Groupoff, 'S' );
     while ( numReceived < numStudents ) {
         _Accept( giftCard );
     }
@@ -16,12 +17,14 @@ void Groupoff::main() {
             yield( groupoffDelay );
             unsigned int i = mprng( 0, requests.size() - 1 );
             WATCard card;
+            prt.print( Groupoff, 'D', sodaCost );
             card.deposit( sodaCost );
             requests[i]->card.delivery( card );
             delete requests[i];
             requests.remove( i );
         }
     }
+    prt.print( Groupoff, 'F' );
 }
 
 WATCard::FWATCard Groupoff::giftCard() {
