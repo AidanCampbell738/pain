@@ -12,6 +12,7 @@ _Task BottlingPlant {
     unsigned int maxShippedPerFlavour;
     unsigned int maxStockPerFlavour;
     unsigned int timeBetweenShipments;
+    bool shutdown = false;
     void main();
   public:
     _Event Shutdown {}; // shutdown plant

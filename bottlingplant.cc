@@ -3,15 +3,24 @@
 void BottlingPlant::main() {
     Truck truck( prt, nameServer, *this, numVendingMachines, maxStockPerFlavour );
     for ( ;; ) {
-        if ( !shipmentSignal.empty() ) {
-            shipmentSignal.signal();
+        _Accept( ~BottlingPlant ) {
+            shutdown = true;
+            break;
         }
-        truckSignal.wait();
-        yield( timeBetweenShipments );
+        _Else {
+            if ( !shipmentSignal.empty() ) {
+                shipmentSignal.signal();
+            }
+            truckSignal.wait();
+            yield( timeBetweenShipments );
+        }
     }
 }
 
 void BottlingPlant::getShipment( unsigned int cargo[ ] ) {
+    if ( shutdown ) {
+        _Throw Shutdown;
+    }
     if ( truckSignal.empty() ) {
         shipmentSignal.wait();
     }

@@ -19,7 +19,15 @@ void Truck::main() {
     for ( ;; ) {
         int firstToService = nextToService;
         unsigned int cargo[NUM_FLAVOURS];
-        plant.getShipment( cargo );
+        _Enable {
+            try {
+                plant.getShipment( cargo );
+            }
+            _Catch ( BottlingPlant::Shutdown ) {
+                break;
+            }
+        }
+        
         yield( mprng( 1, 10 ) );
         do {
             unsigned int * inventory = vendingMachineList[nextToService]->inventory();
