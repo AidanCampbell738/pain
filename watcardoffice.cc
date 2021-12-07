@@ -131,7 +131,9 @@ WATCard::FWATCard WATCardOffice::create(unsigned int sid, unsigned int amount) {
 
 //return future of new watcard after transfer
 WATCard::FWATCard WATCardOffice::transfer(unsigned int sid, unsigned int amount, WATCard* card) {
-    return cardHelper(sid, card->getBalance(), amount);
+    unsigned int oldBalance = card->getBalance();
+    delete card;
+    return cardHelper(sid, oldBalance, amount);
 }
 
 //called by couriers to get a job
