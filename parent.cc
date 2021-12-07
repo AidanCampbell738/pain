@@ -1,13 +1,18 @@
 #include "parent.h"
 
 void Parent::main() {
+    prt.print( Parent, 'S' );
     for ( ;; ) {
         _Accept( ~Parent ) {
+            prt.print( Parent, 'F' );
             break;
         }
         _Else {
             yield( parentalDelay );
-            bank.deposit( mprng( 0, numStudents - 1 ), mprng( 1, 3 ) );
+            unsigned int student = mprng( 0, numStudents - 1 );
+            unsigned int amount = mprng( 1, 3 );
+            prt.print( Parent, 'D', student, amount );
+            bank.deposit( student, amount );
         }
     }
 }
