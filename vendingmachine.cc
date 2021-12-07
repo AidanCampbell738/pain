@@ -8,6 +8,7 @@ VendingMachine::VendingMachine( Printer & prt, NameServer & nameServer, unsigned
 // VendingMachine main task
 void VendingMachine::main() {
     prt.print( Printer::Vending, id, 'S', sodaCost );
+    nameServer.VMregister(this);
     for ( ;; ) {
         _Accept( ~VendingMachine ) {
             // Vending machine was deleted, stop
