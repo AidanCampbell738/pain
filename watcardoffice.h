@@ -33,6 +33,8 @@ _Task WATCardOffice {
     std::vector<Job*> requests;//vector of requests (a vector is allowed as per piazza @1069)
     Courier** couriers;//array of couriers
     uCondition requestingWork;//condition that couriers block on when requesting a job
+    bool stop = false;
+    _Event Stop{};
 
 	void main();//task main
     WATCard::FWATCard cardHelper(unsigned int sid, unsigned int oldBalance, unsigned int amount);//helper to reduce code duplication

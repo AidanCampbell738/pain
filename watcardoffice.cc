@@ -33,9 +33,13 @@ WATCardOffice::~WATCardOffice() {
 void WATCardOffice::Courier::main() {
     printer.print(Printer::Courier, id, 'S');
     for(;;) {
-        if(shouldStop) break;
-        Job* currentJob = office.requestWork();//request job from WATCardOffice (will block)
-        if(shouldStop) break;
+        Job* currentJob;
+        try {
+            currentJob = office.requestWork();//request job from WATCardOffice (will block)
+        }
+        catch (Stop&) {
+            break;
+        }
 
         //Withdraw money from the bank
         printer.print(Printer::Courier, id, 't', currentJob->sid, currentJob->amount);
@@ -94,15 +98,13 @@ void WATCardOffice::main() {
         }
     }
     //terminate couriers
-    for(unsigned int i = 0; i < numCouriers; i++) {
-        couriers[i]->stop();
-    }
+    stop = true;
     //unblock all waiting couriers
     // TODO: changed this naively. Is this what was intended? The previous signal is unused except for here
     //while(!waitForResult.empty()) {
     //    waitForResult.signalBlock();
     //}
-    while(!requestingWork.empty()) {
+    for(unsigned int i = 0; i < numCouriers; i++) {
         requestingWork.signalBlock();
     }
     printer.print(Printer::WATCardOffice, 'F');
@@ -132,6 +134,12 @@ WATCard::FWATCard WATCardOffice::transfer(unsigned int sid, unsigned int amount,
 //called by couriers to get a job
 //will block
 WATCardOffice::Job* WATCardOffice::requestWork() {
+    if (stop){
+        _Throw Stop();
+    }
     requestingWork.wait();
+    if (stop){
+        _Throw Stop();
+    }
     return requests.front();
 }
