@@ -36,6 +36,7 @@ _Task WATCardOffice {
 
 	void main();//task main
     WATCard::FWATCard cardHelper(unsigned int sid, unsigned int oldBalance, unsigned int amount);//helper to reduce code duplication
+    void sendJob();//helper to reduce code duplication
 
   public:
 	_Event Lost {};//lost watcard

@@ -1,5 +1,6 @@
 #include "parent.h"
 #include "MPRNG.h"
+#include <iostream>
 
 // Parent main task
 void Parent::main() {
@@ -14,9 +15,9 @@ void Parent::main() {
             // Delay between deposits
             yield( parentalDelay );
             // Select random student and amount from legal values
-            unsigned int student = mprng( 0, numStudents - 1 );
             unsigned int amount = mprng( 1, 3 );
-            prt.print( Printer::Parent, 'D', student, amount );
+            unsigned int student = mprng( 0, numStudents - 1 );
+            //prt.print( Printer::Parent, 'D', student, amount );
             // Deposit amount to student
             bank.deposit( student, amount );
         }

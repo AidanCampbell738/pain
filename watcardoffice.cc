@@ -65,6 +65,14 @@ void WATCardOffice::Courier::stop() {
     shouldStop = true;
 }
 
+//helper to prevent code duplication
+void WATCardOffice::sendJob() {
+    requestingWork.signalBlock();
+    // TODO: queue would be better here. Probably not a priority unless we have time.
+    requests.erase(requests.begin());
+    printer.print(Printer::WATCardOffice, 'W');
+}
+
 //WATCardOffice Task main
 //will accept create and transfer requests from students
 //will delegate task to calling couriers
@@ -78,13 +86,13 @@ void WATCardOffice::main() {
         }
         or _Accept(create) {
             printer.print(Printer::WATCardOffice, 'C', requests.front()->sid, requests.front()->amount);
+            if(!requestingWork.empty()) sendJob();
         } or _Accept(transfer) {
             printer.print(Printer::WATCardOffice, 'T', requests.front()->sid, requests.front()->amount);
+            if(!requestingWork.empty()) sendJob();
+        } or _Accept(requestWork) {
+            if(requests.size() > 0) sendJob();
         }
-        requestingWork.signalBlock();
-        // TODO: queue would be better here. Probably not a priority unless we have time.
-        requests.erase(requests.begin());
-        printer.print(Printer::WATCardOffice, 'W');
     }
     //terminate couriers
     for(unsigned int i = 0; i < numCouriers; i++) {
