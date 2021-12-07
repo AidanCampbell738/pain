@@ -9,12 +9,18 @@ void Groupoff::main() {
         _Accept( giftCard );
     }
     while ( requests.size() > 0 ) {
-        unsigned int i = mprng( 0, requests.size() - 1 );
-        WATCard card;
-        card.deposit( sodaCost );
-        requests[i]->card.delivery( card );
-        delete requests[i];
-        requests.remove( i );
+        _Accept( ~Groupoff ) {
+            break;
+        }
+        _Else {
+            yield( groupoffDelay );
+            unsigned int i = mprng( 0, requests.size() - 1 );
+            WATCard card;
+            card.deposit( sodaCost );
+            requests[i]->card.delivery( card );
+            delete requests[i];
+            requests.remove( i );
+        }
     }
 }
 

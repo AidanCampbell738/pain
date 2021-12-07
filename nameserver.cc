@@ -10,7 +10,10 @@ void NameServer::main() {
         _Accept( VMregister );
     }
     for ( ;; ) {
-        _Accept( getMachine, getMachineList );
+        _Accept( ~NameServer ) {
+            break;
+        }
+        or _Accept( getMachine, getMachineList );
     }
 }
 
