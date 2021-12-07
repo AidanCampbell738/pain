@@ -9,25 +9,23 @@ void BottlingPlant::main() {
     // Create truck for deliveries
     Truck truck( prt, nameServer, *this, numVendingMachines, maxStockPerFlavour );
     for ( ;; ) {
+        unsigned int bottlesProduced = 0;
+        for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i++ ) {
+            // Generate random bottle production
+            shipment[i] = mprng( 0, maxShippedPerFlavour );
+            bottlesProduced += shipment[i];
+        }
+        prt.print( Printer::BottlingPlant, 'G', bottlesProduced );
+        // Signal truck to pick up shipment
+        shipmentReady = true;
+        shipmentLock.signal();
         // Check if plant is shutting down
         _Accept( ~BottlingPlant ) {
             shutdown = true;
             break;
         }
-        _Else {
-            // Produce a new shipment
-            unsigned int bottlesProduced = 0;
-            for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i++ ) {
-                // Generate random bottle production
-                shipment[i] = mprng( 0, maxShippedPerFlavour );
-                bottlesProduced += shipment[i];
-            }
-            prt.print( Printer::BottlingPlant, 'G', bottlesProduced );
-            // Signal truck to pick up shipment
-            shipmentReady = true;
-            shipmentLock.signal();
-            truckLock.wait();
-            // Wait before producing another shipment
+        or _Accept( getShipment ) {
+            // Wait between production runs
             yield( timeBetweenShipments );
         }
     }
@@ -45,8 +43,6 @@ void BottlingPlant::getShipment( unsigned int cargo[ ] ) {
     if ( !shipmentReady ) {
         shipmentLock.wait();
     }
-    // Signal a new production run to begin
-    truckLock.signal();
     // Copy shipment into cargo
     for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i += 1 ) {
         cargo[i] = shipment[i];
