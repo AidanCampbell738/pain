@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
     delete bp;
 
     //delete vending machines
-    for(unsigned int i = 0; i < cparms.numStudents; i++) {
+    for(unsigned int i = 0; i < cparms.numVendingMachines; i++) {
         delete vms[i];
     }
 }
