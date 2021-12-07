@@ -51,12 +51,10 @@ void WATCardOffice::Courier::main() {
 
         if(mprng(5) == 0) { //lost watcard
             printer.print(Printer::Courier, id, 'L', currentJob->sid);
-            // TODO: the following (commented out) does not compile. I've replaced it with my guess of what's supposed to happen here. Needs to be verified.
             currentJob->result.exception(new Lost);//put exception at future spot
         } else {
             //Create WATCard
             WATCard* watcard = new WATCard();
-            // TODO: Are we sure we leave the old balance?
             watcard->deposit(currentJob->amount + currentJob->oldBalance);
             currentJob->result.delivery(watcard);
         }
@@ -74,7 +72,6 @@ void WATCardOffice::Courier::stop() {
 //helper to prevent code duplication
 void WATCardOffice::sendJob() {
     requestingWork.signalBlock();
-    // TODO: queue would be better here. Probably not a priority unless we have time.
     requests.erase(requests.begin());
     printer.print(Printer::WATCardOffice, 'W');
 }
@@ -83,7 +80,6 @@ void WATCardOffice::sendJob() {
 //will accept create and transfer requests from students
 //will delegate task to calling couriers
 //when terminated (passed an sid of -1), will terminate all couriers and unblock waiting couriers
-// TODO: changed this so that instead of sid -1 (impossible since these are uints) we wait for the destructor - verify this is correct
 void WATCardOffice::main() {
     printer.print(Printer::WATCardOffice, 'S');
     for(;;) {
@@ -103,10 +99,6 @@ void WATCardOffice::main() {
     //terminate couriers
     stop = true;
     //unblock all waiting couriers
-    // TODO: changed this naively. Is this what was intended? The previous signal is unused except for here
-    //while(!waitForResult.empty()) {
-    //    waitForResult.signalBlock();
-    //}
     for(unsigned int i = 0; i < numCouriers; i++) {
         requestingWork.signalBlock();
     }
