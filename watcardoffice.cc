@@ -23,6 +23,9 @@ WATCardOffice::~WATCardOffice() {
         delete couriers[i];
     }
     delete [] couriers;
+    for (Job* job : requests) {
+        delete job;
+    }
 }
 
 //Courier Task main
