@@ -87,10 +87,10 @@ void WATCardOffice::main() {
             break;
         }
         or _Accept(create) {
-            printer.print(Printer::WATCardOffice, 'C', requests.front()->sid, requests.front()->amount);
+            printer.print(Printer::WATCardOffice, 'C', requests.back()->sid, requests.back()->amount);
             if(!requestingWork.empty()) sendJob();
         } or _Accept(transfer) {
-            printer.print(Printer::WATCardOffice, 'T', requests.front()->sid, requests.front()->amount);
+            printer.print(Printer::WATCardOffice, 'T', requests.back()->sid, requests.back()->amount);
             if(!requestingWork.empty()) sendJob();
         } or _Accept(requestWork) {
             if(requests.size() > 0) sendJob();
