@@ -42,6 +42,7 @@ void Student::main() {
                 if(myGiftcard.available()) {
                     vendingmachine->buy((VendingMachine::Flavours)favFlavour, *myGiftcard());//try to buy
                     printer.print(Printer::Student, id, 'G', favFlavour, myGiftcard()->getBalance());
+                    myGiftcard.reset();
                 } else {
                     vendingmachine->buy((VendingMachine::Flavours)favFlavour, *myWatcard());//try to buy
                     printer.print(Printer::Student, id, 'B', favFlavour, myWatcard()->getBalance());

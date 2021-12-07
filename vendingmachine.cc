@@ -10,16 +10,18 @@ void VendingMachine::main() {
     prt.print( Printer::Vending, id, 'S', sodaCost );
     nameServer.VMregister(this);
     for ( ;; ) {
-        _Accept( ~VendingMachine ) {
-            // Vending machine was deleted, stop
-            prt.print( Printer::Vending, id, 'F' );
-            break;
-        }
-        // When restocking begins, block other tasks until restocking ends
-        or _Accept( inventory ) {
-            _Accept( restocked );
-        }
-        or _Accept( buy );
+        try {
+            _Accept( ~VendingMachine ) {
+                // Vending machine was deleted, stop
+                prt.print( Printer::Vending, id, 'F' );
+                break;
+            }
+            // When restocking begins, block other tasks until restocking ends
+            or _Accept( inventory ) {
+                _Accept( restocked );
+            }
+            or _Accept( buy );
+        } catch( uMutexFailure::RendezvousFailure & ) {}
     }
 }
 
