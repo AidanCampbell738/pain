@@ -32,6 +32,9 @@ void BottlingPlant::main() {
         // Check if plant is shutting down
         _Accept( ~BottlingPlant ) {
             shutdown = true;
+            try {
+                _Accept(getShipment); //wait for truck and shut it down
+            } catch( uMutexFailure::RendezvousFailure & ) {}
             break;
         //I replaced _Else with this accept
         //According to Piazza 1056, we can't use an _Else here
