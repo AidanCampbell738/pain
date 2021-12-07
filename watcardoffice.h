@@ -38,11 +38,6 @@ _Task WATCardOffice {
     WATCard::FWATCard cardHelper(unsigned int sid, unsigned int oldBalance, unsigned int amount);//helper to reduce code duplication
 
   public:
-    /*================================================================================*
-     *
-     * Passing an sid value of -1 will terminate the WATCardOffice and all its couriers
-     *
-     *================================================================================*/
 	_Event Lost {};//lost watcard
 	WATCardOffice(Printer& prt, Bank& bank, unsigned int numCouriers);//constructor
     ~WATCardOffice();//destructor
