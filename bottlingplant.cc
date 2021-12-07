@@ -2,33 +2,24 @@
 #include "truck.h"
 #include <algorithm>
 #include "MPRNG.h"
-
-//Wait for timeBetweenShipments
-void BottlingPlant::produceShipment() {
-    // Wait before producing another shipment
-    yield( timeBetweenShipments );
-    // Produce a new shipment
-    unsigned int bottlesProduced = 0;
-    for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i++ ) {
-        // Generate random bottle production
-        shipment[i] = mprng( 0, maxShippedPerFlavour );
-        bottlesProduced += shipment[i];
-    }
-    prt.print( Printer::BottlingPlant, 'G', bottlesProduced );
-    //Simplify (locks aren't necessary)
-    // Signal truck to pick up shipment
-    //shipmentReady = true;
-    //shipmentLock.signal();
-    //truckLock.wait();
-}
+#include <iostream>
 
 // Main task for BottlingPlant
 void BottlingPlant::main() {
     prt.print( Printer::BottlingPlant, 'S' );
     // Create truck for deliveries
     Truck truck( prt, nameServer, *this, numVendingMachines, maxStockPerFlavour );
-    produceShipment();//produce initial shipment (delay must happen here)
     for ( ;; ) {
+        unsigned int bottlesProduced = 0;
+        for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i++ ) {
+            // Generate random bottle production
+            shipment[i] = mprng( 0, maxShippedPerFlavour );
+            bottlesProduced += shipment[i];
+        }
+        prt.print( Printer::BottlingPlant, 'G', bottlesProduced );
+        // Signal truck to pick up shipment
+        shipmentReady = true;
+        shipmentLock.signal();
         // Check if plant is shutting down
         _Accept( ~BottlingPlant ) {
             shutdown = true;
@@ -36,30 +27,29 @@ void BottlingPlant::main() {
                 _Accept(getShipment); //wait for truck and shut it down
             } catch( uMutexFailure::RendezvousFailure & ) {}
             break;
-        //I replaced _Else with this accept
-        //According to Piazza 1056, we can't use an _Else here
-        } or _Accept(getShipment) {
-            produceShipment();
+        }
+        or _Accept( getShipment ) {
+            // Wait between production runs
+            yield( timeBetweenShipments );
         }
     }
     prt.print( Printer::BottlingPlant, 'F' );
+    // Allow truck to receive exception
+    _Accept( getShipment );
 }
-
 
 // Wait for, and retrieve, a shipment of bottles from the Plant, copying the shipment into cargo
 // Can block
 void BottlingPlant::getShipment( unsigned int cargo[ ] ) {
     if ( shutdown ) {
         // Plant is shutting down
+        uRendezvousAcceptor();
         _Throw Shutdown();
     }
-    //Locks aren't necessary
     // Shipment isn't ready yet, wait until it is
-    /*if ( !shipmentReady ) {
+    if ( !shipmentReady ) {
         shipmentLock.wait();
     }
-    // Signal a new production run to begin
-    truckLock.signal();*/
     // Copy shipment into cargo
     for ( unsigned int i = 0; i < VendingMachine::NUM_FLAVOURS; i += 1 ) {
         cargo[i] = shipment[i];
