@@ -35,7 +35,6 @@ void BottlingPlant::main() {
     }
     prt.print( Printer::BottlingPlant, 'F' );
     // Allow truck to receive exception
-    _Accept( getShipment );
 }
 
 // Wait for, and retrieve, a shipment of bottles from the Plant, copying the shipment into cargo
