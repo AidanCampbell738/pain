@@ -13,9 +13,10 @@ _Task BottlingPlant {
     unsigned int timeBetweenShipments;
     std::vector<unsigned int> shipment;
     bool shutdown = false;
-    bool shipmentReady = false;
-    uCondition shipmentLock;
-    uCondition truckLock;
+    //bool shipmentReady = false;
+    //uCondition shipmentLock;
+    //uCondition truckLock;
+    void produceShipment();//helper to prevent code duplication
     void main();
   public:
     _Event Shutdown {}; // shutdown plant
