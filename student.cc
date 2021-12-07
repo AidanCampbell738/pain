@@ -16,6 +16,15 @@ VendingMachine * Student::getVM() {
     return vm;
 }
 
+Student::~Student(){
+    if (myGiftcard.available()){
+        delete myGiftcard();
+    }
+    if (myWatcard.available()){
+        delete myWatcard();
+    }
+}
+
 //Student Task main
 //It will first initialize the number of soda purchases, the favourite flavour, the watcard, giftcard, and initial vending machine
 //After, it will loop to purchase numPurchases favourite soda
@@ -27,8 +36,8 @@ void Student::main() {
     int favFlavour = mprng(3);//favourite flavour
     printer.print(Printer::Student, id, 'S', favFlavour, numPurchases);
 
-    WATCard::FWATCard myWatcard = cardOffice.create(id, 5);//create watcard
-    WATCard::FWATCard myGiftcard = groupoff.giftCard();//get giftcard
+    myWatcard = cardOffice.create(id, 5);//create watcard
+    myGiftcard = groupoff.giftCard();//get giftcard
     VendingMachine* vendingmachine = getVM();//get initial vending machine
 
     //Buy numPurchases number of favourite soda

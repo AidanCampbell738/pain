@@ -11,12 +11,16 @@ _Task Student {
     WATCardOffice& cardOffice;//WATCardOffice reference
     Groupoff& groupoff;//Groupoff reference
     unsigned int id, maxPurchases;//Student id, maximum number of soda purchases
+    WATCard::FWATCard myGiftcard;
+    WATCard::FWATCard myWatcard;
 
     VendingMachine* getVM();//helper function to prevent code duplication    
-	  void main();//tast main
+	void main();//tast main
 
   public:
-	  Student(Printer& prt, NameServer& nameServer, WATCardOffice& cardOffice, Groupoff& groupoff,
-			 unsigned int id, unsigned int maxPurchases) : printer(prt), nameServer(nameServer), 
-             cardOffice(cardOffice), groupoff(groupoff), id(id), maxPurchases(maxPurchases) {}//constructor
+    ~Student();
+
+	Student(Printer& prt, NameServer& nameServer, WATCardOffice& cardOffice, Groupoff& groupoff,
+    unsigned int id, unsigned int maxPurchases) : printer(prt), nameServer(nameServer), 
+    cardOffice(cardOffice), groupoff(groupoff), id(id), maxPurchases(maxPurchases) {}//constructor
 };
