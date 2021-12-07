@@ -37,11 +37,13 @@ void Student::main() {
 
         //Keep looping until a purchase has been made
         for(;;) {
+            bool available = myGiftcard.available();
             try {
                 //Choose a giftcard, if available
-                if(myGiftcard.available()) {
+                if(available) {
                     vendingmachine->buy((VendingMachine::Flavours)favFlavour, *myGiftcard());//try to buy
                     printer.print(Printer::Student, id, 'G', favFlavour, myGiftcard()->getBalance());
+                    delete myGiftcard();
                     myGiftcard.reset();
                 } else {
                     vendingmachine->buy((VendingMachine::Flavours)favFlavour, *myWatcard());//try to buy
@@ -52,7 +54,7 @@ void Student::main() {
                 printer.print(Printer::Student, id, 'L');//print message
                 myWatcard = cardOffice.create(id, 5);//get new watcard
             } _Catch(VendingMachine::Free&) {//free soda
-                if(myGiftcard.available()) {//print message
+                if(available) {//print message
                     printer.print(Printer::Student, id, 'a', favFlavour, myGiftcard()->getBalance());
                 } else {
                     printer.print(Printer::Student, id, 'A', favFlavour, myWatcard()->getBalance());
