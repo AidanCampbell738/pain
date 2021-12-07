@@ -47,7 +47,6 @@ void WATCardOffice::Courier::main() {
         //Withdraw money from the bank
         printer.print(Printer::Courier, id, 't', currentJob->sid, currentJob->amount);
         bank.withdraw(currentJob->sid, currentJob->amount);
-        printer.print(Printer::Courier, id, 'T', currentJob->sid, currentJob->amount);
 
         if(mprng(5) == 0) { //lost watcard
             printer.print(Printer::Courier, id, 'L', currentJob->sid);
@@ -57,6 +56,7 @@ void WATCardOffice::Courier::main() {
             WATCard* watcard = new WATCard();
             watcard->deposit(currentJob->amount + currentJob->oldBalance);
             currentJob->result.delivery(watcard);
+            printer.print(Printer::Courier, id, 'T', currentJob->sid, currentJob->amount);
         }
         delete currentJob;
     }
