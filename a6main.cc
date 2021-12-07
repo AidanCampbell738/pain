@@ -17,7 +17,7 @@ using namespace std;
 MPRNG mprng(getpid());//global RNG variable
 
 int main(int argc, char* argv[]) {
-    char* inputFile = "soda.config";
+    const char* inputFile = "soda.config";
     int processors = 1;
     ConfigParms cparms;
 
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 
     //Create vending machines
     VendingMachine* vms[cparms.numVendingMachines];
-    for(int i = 0; i < cparms.numVendingMachines; i++) {
+    for(unsigned int i = 0; i < cparms.numVendingMachines; i++) {
         vms[i] = new VendingMachine(printer, nameServer, i, cparms.sodaCost);
     }
 
@@ -77,12 +77,12 @@ int main(int argc, char* argv[]) {
 
     //Create students
     Student* students[cparms.numStudents];
-    for(int i = 0; i < cparms.numStudents; i++) {
+    for(unsigned int i = 0; i < cparms.numStudents; i++) {
         students[i] = new Student(printer, nameServer, cardOffice, groupoff, i, cparms.maxPurchases);
     }
 
     //Wait for students to finish
-    for(int i = 0; i < cparms.numStudents; i++) {
+    for(unsigned int i = 0; i < cparms.numStudents; i++) {
         delete students[i];
     }
 
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
     delete bp;
 
     //delete vending machines
-    for(int i = 0; i < cparms.numStudents; i++) {
+    for(unsigned int i = 0; i < cparms.numStudents; i++) {
         delete vms[i];
     }
 }
