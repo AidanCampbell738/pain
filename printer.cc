@@ -64,21 +64,21 @@ void Printer::flush() {
                 case 'F':
                 case 'W':
                 case 'X':
-                case 'P': if(buffer[i].kind == Kind::Truck) break;
-                case 'L': if(buffer[i].kind == Kind::Courier) break;
-                case 'R': if(buffer[i].kind == Kind::NameServer) break;
-                case 'A': if(buffer[i].kind == Kind::Student) break;
+                case 'P': if(buffer[i].kind == Kind::Truck && buffer[i].state == 'P') break;
+                case 'L': if(buffer[i].kind == Kind::Courier && buffer[i].state == 'L') break;
+                case 'R': if(buffer[i].kind == Kind::NameServer && buffer[i].state == 'R') break;
+                case 'A': if(buffer[i].kind == Kind::Student && buffer[i].state == 'A') break;
                 case 'r': cout << buffer[i].state;
             }
 
             //print state data with one datavalue
             switch(buffer[i].state) {
                 case 'D': if(buffer[i].kind == Kind::Parent || buffer[i].kind == Kind::Truck) break;
-                case 'R': if(buffer[i].kind == Kind::Vending) break;
-                case 'P': if(buffer[i].kind == Kind::BottlingPlant) break;
-                case 'G': if(buffer[i].kind == Kind::Student) break;
-                case 'L': if(buffer[i].kind == Kind::Student) break;
-                case 'S': if(buffer[i].kind != Kind::Vending) break;
+                case 'R': if(buffer[i].kind == Kind::Vending && buffer[i].state == 'R') break;
+                case 'P': if(buffer[i].kind == Kind::BottlingPlant && buffer[i].state == 'P') break;
+                case 'G': if(buffer[i].kind == Kind::Student && buffer[i].state == 'G') break;
+                case 'L': if(buffer[i].kind == Kind::Student && buffer[i].state == 'L') break;
+                case 'S': if(buffer[i].kind != Kind::Vending && buffer[i].state == 'S') break;
                 case 'V': cout << buffer[i].state << buffer[i].dataValue1;
             }
 
@@ -90,12 +90,12 @@ void Printer::flush() {
                 case 'N':
                 case 'd':
                 case 'U':
-                case 'S': if(buffer[i].kind != Kind::Student) break;
-                case 'G': if(buffer[i].kind == Kind::BottlingPlant) break;
+                case 'S': if(buffer[i].kind != Kind::Student && buffer[i].state == 'S') break;
+                case 'G': if(buffer[i].kind == Kind::BottlingPlant && buffer[i].state == 'G') break;
                 case 'a':
                 case 'B':
-                case 'A': if(buffer[i].kind == Kind::Vending) break;
-                case 't': cout << buffer[i].dataValue1 << "," << buffer[i].dataValue2;
+                case 'A': if(buffer[i].kind == Kind::Vending && buffer[i].state == 'A') break;
+                case 't': cout << buffer[i].state << buffer[i].dataValue1 << "," << buffer[i].dataValue2;
             }
         } else {
             blankSpaces++;
@@ -124,7 +124,9 @@ unsigned int Printer::getBufferIdFromKind(Kind kind, int lid) {
 //Helper function to prevent code duplication
 //sets basic values of the message data and will flush all data if necessary
 void Printer::printHelper(int id, Kind kind, char state) {
-    if(buffer[id].assigned) flush();
+    if(buffer[id].assigned) {
+        flush();
+    }
     buffer[id].state = state;
     buffer[id].kind = kind;
     buffer[id].assigned = true;
