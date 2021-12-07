@@ -1,6 +1,8 @@
 #include "vendingmachine.h"
 
-VendingMachine::VendingMachine( Printer & prt, NameServer & nameServer, unsigned int id, unsigned int sodaCost );
+VendingMachine::VendingMachine( Printer & prt, NameServer & nameServer, unsigned int id, unsigned int sodaCost ) : prt( prt ), nameServer( nameServer ), id( id ), sodaCost( sodaCost ) {
+    sodaInventory.resize( NUM_FLAVOURS );
+}
 
 void VendingMachine::main() {
     for ( ;; ) {

@@ -4,6 +4,7 @@
 #include "printer.h"
 
 _Task VendingMachine {
+    std::vector<unsigned int> sodaInventory;
     Printer & prt;
     NameServer & nameServer;
     unsigned int id;
