@@ -12,7 +12,6 @@ For this case, the given soda.config file was used.
 Partial Output:
 
 ./soda soda.config 127
-
 Parent	Gropoff	WATOff	Names	Truck	Plant	Stud0	Stud1	Mach0	Mach1	Mach2	Cour0
 *******	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******
 S	S	S	S					S2			S
@@ -61,6 +60,42 @@ Case 2 - Insufficient Funds
 
 For this case, the given soda.config file was used.
 
+Partial Output:
+
+./soda soda.config 123
+Parent  Gropoff WATOff  Names   Truck   Plant   Stud0   Stud1   Mach0   Mach1   Mach2   Cour0
+******* ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* *******
+S       S       S       S                                       S2                      S
+                        R0              S                               S2      S2
+                C0,5    R1      S       G5      S3,5    S1,2
+D0,3            W       R2                                                              t0,5
+                C1,5    N0,0                    V0
+
+...
+                                U1,5            B3,1                    R       B3,2
+D1,2                            D1,0    P
+                                P9
+                                d2,9                                            r
+                                U2,1                                            R
+                                D2,4
+                                d0,4                            r
+                                U0,2
+                                U0,3
+D1,1                            U0,5    G8                      R
+                                D0,3
+                                d1,3                                    r
+                                U1,3
+                                U1,5
+                T0,7            U1,5                                    R
+                                D1,0                                                    t0,7
+D1,1            W               P8      P                                               T0,7
+                                d2,8                                            r
+                                D2,7                                            R
+                                d0,7                            r
+                                U0,2
+D1,1                            U0,3    G2      B3,6            R               B3,4
+
+
 In the output above, we see that after Student 0 buys a soda (“B3,1”), their WATCard balance becomes $1. 
 Since this balance is less than the soda cost ($2), they will have insufficient funds on their next purchase. 
 Accordingly, we see that in the WATCard Office column, a transfer is made for $7. This is the correct transfer 
@@ -77,6 +112,36 @@ Case 3 - Multiple Free Sodas
 
 For this case, the given soda.config file was used.
 
+Partial Output:
+
+./soda soda.config 127
+Parent  Gropoff WATOff  Names   Truck   Plant   Stud0   Stud1   Mach0   Mach1   Mach2   Cour0
+******* ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* *******
+S       S       S       S                                       S2                      S
+                        R0              S                               S2      S2
+                C0,5    R1      S       G3      S1,5    S3,3
+D0,2            W       R2                                                              t0,5
+                C1,5    N0,0                    V0
+
+…
+
+D1,1                            D0,0
+D0,3                            P4      P                       A                       T0,7
+                                d1,4                                    r
+D0,2                            U1,1            A1,8                    R
+                                D1,2
+                                d2,2                                            r
+                                U2,2
+                                U2,4    G7                                      R
+                                D2,2
+                                d0,2                            r
+                                U0,5
+                                U0,2
+                                U0,2                            R
+D1,3                            D0,2            A1,8            A
+D0,1                            P7      P       B1,6            B1,1
+
+
 In the output above, we see that Student 0 starts with vending machine 0. In the excluded code (represented by “...”),
 student 0 does not get a new vending machine. Later in the output, we can see that machine 0 gave out a free soda. 
 Student 0, whose vending machine is 0, received this free soda. Accordingly, Student 0 printed the appropriate message 
@@ -91,6 +156,41 @@ Case 4 - Machine Out of Stock
 ----------------------
 
 For this case, the given soda.config file was used.
+
+Partial Output:
+
+./soda soda.config 127
+Parent  Gropoff WATOff  Names   Truck   Plant   Stud0   Stud1   Mach0   Mach1   Mach2   Cour0
+******* ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* *******
+S       S       S       S                                       S2                      S
+                        R0              S                               S2      S2
+                C0,5    R1      S       G3      S1,5    S3,3
+D0,2            W       R2                                                              t0,5
+                C1,5    N0,0                    V0
+D1,2                    N1,1                            V1
+D1,2    D2                      P3      P
+                                d0,3                            r
+                                U0,5
+                                U0,3
+                                U0,5
+D0,3                            U0,4                            R                       L0
+                C0,5            D0,0    G4      L               B1,1
+D1,3                                            G1,0                                    t1,5
+        D2      W       N1,2                            V2                              T1,5
+        F                       P4      P
+                                d1,4                                    r
+                                U1,4
+                                U1,3
+                                U1,5
+D0,2            W               U1,4                                    R               t0,5
+D0,1                    N1,0    D1,0    G9              V0
+D0,3                            P9      P
+                                d2,9                                            r
+                                U2,3
+                                U2,4
+                                U2,2
+                                U2,2                    G3,0    B3,0                    T0,5
+
 
 In the output above, we can see that Student 1 starts with vending machine 1 and their favourite soda flavour is 3. 
 Unfortunately, they try to buy soda but V1 does not have any. As a result, they get a new vending machine as shown by the 
@@ -107,6 +207,22 @@ Case 5 - Flat Tire
 
 For this case, the given soda.config file was used.
 
+Partial Output:
+
+./soda soda.config 135
+Parent  Gropoff WATOff  Names   Truck   Plant   Stud0   Stud1   Mach0   Mach1   Mach2   Cour0
+******* ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* *******
+S       S       S       S                                       S2                      S
+...
+                                D1,0
+        D2                      X
+D1,2    F       W                       G5                                              t1,5
+D1,3                    N1,2                    G2,0    V2              B2,0            T1,5
+D0,1                    N1,0                            V0
+D1,1                    N0,2    P5      P       V2
+...
+
+
 In the output above we see that the Truck gets a flat tire after delivering to vending machine 1. 
 This is correctly shown through the “X” message. The flat tire also occurs at the correct time, 
 after a delivery is complete (indicated by “D1,0”). We can also see that the Truck does not print 
@@ -119,6 +235,18 @@ Case 6 - Empty Production Run
 For this case, the given soda.config was used but MaxShippedPerFlavour was changed from 3 
 to 1 (to make this case more likely).
 
+Partial Output:
+
+/soda soda.config 140
+Parent  Gropoff WATOff  Names   Truck   Plant   Stud0   Stud1   Mach0   Mach1   Mach2   Cour0
+******* ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* *******
+...
+D0,2                    N1,2    P0      P               V2
+                                        G4
+                                P4      P
+...
+
+
 In the output above, we can see that the truck picks up a shipment of 0 bottles (correctly indicated by “P0”). 
 In our implementation, the truck stops delivering when it runs out of bottles. As a result, when the truck received 
 the shipment of 0 bottles, it immediately stopped “delivering” this shipment and got a new shipment as soon as 
@@ -130,6 +258,34 @@ Case 7 - Leftover Soda in Truck After Loop
 
 For this case, the given soda.config was used but MaxShippedPerFlavour was changed from 3 to 100 
 (to make this case more likely).
+
+Partial Output:
+
+./soda soda.config 140
+Parent  Gropoff WATOff  Names   Truck   Plant   Stud0   Stud1   Mach0   Mach1   Mach2   Cour0
+******* ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* *******
+S       S       S       S                                       S2                      S
+                        R0              S                               S2      S2
+                C0,5    R1      S       G113    S2,8    S0,5
+D0,3            W       R2                                                              t0,5
+                C1,5    N0,0                    V0
+D1,3                    N1,1                            V1
+D0,3    D2              N0,1    P113    P       V1                                      T0,5
+                                d0,113                          r
+D1,2            W               U0,5                                                    t1,5
+                                D0,98                           R                       T1,5
+                                d1,98                                   r
+                                U1,5    G232                            R
+                                D1,83
+                                d2,83                                           r
+D0,1                    N0,2    U2,5            V2                              R
+        D2                      D2,68                   B0,3            B0,4
+D0,1    F                                               G0,0            B0,3
+D0,1                    N0,0    P232    P       V0
+                                d0,232                          r
+... 
+*****************
+
 
 In the output above, we can see that the first shipment has 113 bottles (indicated by “P113”). 
 We also see that after the truck completes the cycle, there are 68 bottles that have not been delivered to 
@@ -149,7 +305,9 @@ Case 8 - Student Buys Using Gift Card Only
 For this test case, we will be using a new config file, onesoda.config
 This file is the same as soda.config, but MaxPurchases is 1.
 
-bengelman@LAPTOP-KHEELMBB:~/a6$ ./soda onesoda.config 150
+Partial Output:
+
+./soda onesoda.config 150
 Parent  Gropoff WATOff  Names   Truck   Plant   Stud0   Stud1   Mach0   Mach1   Mach2   Cour0
 ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* ******* *******
 S       S       S       S                                       S2                      S
